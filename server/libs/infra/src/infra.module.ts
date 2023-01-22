@@ -6,7 +6,7 @@ import {
   IUserRepository,
   QueueName,
 } from '@app/domain';
-import { databaseConfig, UserEntity } from '@app/infra';
+import { databaseConfig, UserEntity, UserTokenEntity } from '@app/infra';
 import { BullModule } from '@nestjs/bull';
 import { Global, Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +15,8 @@ import { APIKeyEntity, SystemConfigEntity, UserRepository } from './db';
 import { APIKeyRepository } from './db/repository';
 import { SystemConfigRepository } from './db/repository/system-config.repository';
 import { JobRepository } from './job';
+import { IUserTokenRepository } from '@app/domain/user-token';
+import { UserTokenRepository } from '@app/infra/db/repository/user-token.repository';
 
 const providers: Provider[] = [
   //
@@ -23,13 +25,14 @@ const providers: Provider[] = [
   { provide: IJobRepository, useClass: JobRepository },
   { provide: ISystemConfigRepository, useClass: SystemConfigRepository },
   { provide: IUserRepository, useClass: UserRepository },
+  { provide: IUserTokenRepository, useClass: UserTokenRepository },
 ];
 
 @Global()
 @Module({
   imports: [
     TypeOrmModule.forRoot(databaseConfig),
-    TypeOrmModule.forFeature([APIKeyEntity, UserEntity, SystemConfigEntity]),
+    TypeOrmModule.forFeature([APIKeyEntity, UserEntity, SystemConfigEntity, UserTokenEntity]),
     BullModule.forRootAsync({
       useFactory: async () => ({
         prefix: 'immich_bull',

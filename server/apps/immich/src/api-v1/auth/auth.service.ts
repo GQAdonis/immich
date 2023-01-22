@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from '@app/infra';
 import { AuthType } from '../../constants/jwt.constant';
 import { AuthUserDto } from '../../decorators/auth-user.decorator';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
+import { ImmichUserTokenService } from '../../modules/immich-jwt/immich-user-token.service';
 import { IUserRepository } from '@app/domain';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginCredentialDto } from './dto/login-credential.dto';
@@ -30,7 +30,7 @@ export class AuthService {
 
   constructor(
     private oauthService: OAuthService,
-    private immichJwtService: ImmichJwtService,
+    private immichJwtService: ImmichUserTokenService,
     @Inject(IUserRepository) userRepository: IUserRepository,
     private configService: SystemConfigService,
     @Inject(INITIAL_SYSTEM_CONFIG) private config: SystemConfig,

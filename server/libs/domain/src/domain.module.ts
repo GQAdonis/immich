@@ -2,6 +2,7 @@ import { DynamicModule, Global, Module, ModuleMetadata, Provider } from '@nestjs
 import { APIKeyService } from './api-key';
 import { SystemConfigService } from './system-config';
 import { UserService } from './user';
+import { UserTokenService } from '@app/domain/user-token';
 
 export const INITIAL_SYSTEM_CONFIG = 'INITIAL_SYSTEM_CONFIG';
 
@@ -10,7 +11,7 @@ const providers: Provider[] = [
   APIKeyService,
   SystemConfigService,
   UserService,
-
+  UserTokenService,
   {
     provide: INITIAL_SYSTEM_CONFIG,
     inject: [SystemConfigService],

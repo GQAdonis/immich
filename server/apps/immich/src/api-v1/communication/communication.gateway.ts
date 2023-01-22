@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
+import { UserTokenService } from '@app/domain';
 
 @WebSocketGateway({ cors: true })
 export class CommunicationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger(CommunicationGateway.name);
 
-  constructor(private immichJwtService: ImmichJwtService) {}
+  constructor(private immichJwtService: UserTokenService) {}
 
   @WebSocketServer() server!: Server;
 
@@ -20,7 +20,7 @@ export class CommunicationGateway implements OnGatewayConnection, OnGatewayDisco
     try {
       this.logger.log(`New websocket connection: ${client.id}`);
 
-      const user = await this.immichJwtService.validateSocket(client);
+      const user = await this.immichJwtService.validate(client.request.headers);
       if (user) {
         client.join(user.id);
       } else {

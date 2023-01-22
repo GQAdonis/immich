@@ -2,9 +2,16 @@ import { SystemConfig } from '@app/infra';
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientMetadata, custom, generators, Issuer, UserinfoResponse } from 'openid-client';
 import { AuthUserDto } from '../../decorators/auth-user.decorator';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
+import { ImmichUserTokenService } from '../../modules/immich-jwt/immich-user-token.service';
 import { LoginResponseDto } from '../auth/response-dto/login-response.dto';
-import { IUserRepository, UserResponseDto, UserCore, SystemConfigService, INITIAL_SYSTEM_CONFIG } from '@app/domain';
+import {
+  IUserRepository,
+  UserResponseDto,
+  UserCore,
+  SystemConfigService,
+  INITIAL_SYSTEM_CONFIG,
+  UserTokenService,
+} from '@app/domain';
 import { OAuthCallbackDto } from './dto/oauth-auth-code.dto';
 import { OAuthConfigDto } from './dto/oauth-config.dto';
 import { OAuthConfigResponseDto } from './response-dto/oauth-config-response.dto';
@@ -21,7 +28,7 @@ export class OAuthService {
   private readonly logger = new Logger(OAuthService.name);
 
   constructor(
-    private immichJwtService: ImmichJwtService,
+    private userTokenService: UserTokenService,
     configService: SystemConfigService,
     @Inject(IUserRepository) userRepository: IUserRepository,
     @Inject(INITIAL_SYSTEM_CONFIG) private config: SystemConfig,
@@ -88,7 +95,7 @@ export class OAuthService {
       });
     }
 
-    return this.immichJwtService.createLoginResponse(user);
+    return this.userTokenService.createLoginResponse(user);
   }
 
   public async link(user: AuthUserDto, dto: OAuthCallbackDto): Promise<UserResponseDto> {

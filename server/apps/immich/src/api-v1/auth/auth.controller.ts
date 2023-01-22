@@ -4,8 +4,7 @@ import { Request, Response } from 'express';
 import { AuthType, IMMICH_AUTH_TYPE_COOKIE } from '../../constants/jwt.constant';
 import { AuthUserDto, GetAuthUser } from '../../decorators/auth-user.decorator';
 import { Authenticated } from '../../decorators/authenticated.decorator';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
-import { UserResponseDto } from '@app/domain';
+import { UserResponseDto, UserTokenService } from '@app/domain';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginCredentialDto } from './dto/login-credential.dto';
@@ -18,7 +17,7 @@ import { ValidateAccessTokenResponseDto } from './response-dto/validate-asset-to
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly immichJwtService: ImmichJwtService) {}
+  constructor(private readonly authService: AuthService, private readonly userTokenService: UserTokenService) {}
 
   @Post('/login')
   async login(
@@ -30,7 +29,7 @@ export class AuthController {
     const loginResponse = await this.authService.login(loginCredential, clientIp);
     response.setHeader(
       'Set-Cookie',
-      this.immichJwtService.getCookies(loginResponse, AuthType.PASSWORD, request.secure),
+      this.userTokenService.getCookies(loginResponse, AuthType.PASSWORD, request.secure),
     );
     return loginResponse;
   }
@@ -62,7 +61,7 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) response: Response): Promise<LogoutResponseDto> {
     const authType: AuthType = req.cookies[IMMICH_AUTH_TYPE_COOKIE];
 
-    const cookies = this.immichJwtService.getCookieNames();
+    const cookies = this.userTokenService.getCookieNames();
     for (const cookie of cookies) {
       response.clearCookie(cookie);
     }

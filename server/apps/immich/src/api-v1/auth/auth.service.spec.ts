@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { SystemConfig } from '@app/infra';
 import { SystemConfigService } from '@app/domain';
 import { AuthType } from '../../constants/jwt.constant';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
+import { ImmichUserTokenService } from '../../modules/immich-jwt/immich-user-token.service';
 import { OAuthService } from '../oauth/oauth.service';
 import { IUserRepository } from '@app/domain';
 import { AuthService } from './auth.service';
@@ -49,7 +49,7 @@ jest.mock('@nestjs/common', () => ({
 describe('AuthService', () => {
   let sut: AuthService;
   let userRepositoryMock: jest.Mocked<IUserRepository>;
-  let immichJwtServiceMock: jest.Mocked<ImmichJwtService>;
+  let immichJwtServiceMock: jest.Mocked<ImmichUserTokenService>;
   let immichConfigServiceMock: jest.Mocked<SystemConfigService>;
   let oauthServiceMock: jest.Mocked<OAuthService>;
   let compare: jest.Mock;
@@ -81,7 +81,7 @@ describe('AuthService', () => {
       validateToken: jest.fn(),
       extractJwtFromHeader: jest.fn(),
       extractJwtFromCookie: jest.fn(),
-    } as unknown as jest.Mocked<ImmichJwtService>;
+    } as unknown as jest.Mocked<ImmichUserTokenService>;
 
     oauthServiceMock = {
       getLogoutEndpoint: jest.fn(),

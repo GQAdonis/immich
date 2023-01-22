@@ -4,3 +4,4 @@ export * from './domain.module';
 export * from './job';
 export * from './system-config';
 export * from './user';
+export * from './user-token';

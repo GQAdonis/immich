@@ -3,7 +3,7 @@ import { SystemConfigService } from '@app/domain';
 import { BadRequestException } from '@nestjs/common';
 import { generators, Issuer } from 'openid-client';
 import { AuthUserDto } from '../../decorators/auth-user.decorator';
-import { ImmichJwtService } from '../../modules/immich-jwt/immich-jwt.service';
+import { ImmichUserTokenService } from '../../modules/immich-jwt/immich-user-token.service';
 import { LoginResponseDto } from '../auth/response-dto/login-response.dto';
 import { OAuthService } from '../oauth/oauth.service';
 import { IUserRepository } from '@app/domain';
@@ -87,7 +87,7 @@ describe('OAuthService', () => {
   let sut: OAuthService;
   let userRepositoryMock: jest.Mocked<IUserRepository>;
   let immichConfigServiceMock: jest.Mocked<SystemConfigService>;
-  let immichJwtServiceMock: jest.Mocked<ImmichJwtService>;
+  let immichJwtServiceMock: jest.Mocked<ImmichUserTokenService>;
   let callbackMock: jest.Mock;
 
   beforeEach(async () => {
@@ -128,7 +128,7 @@ describe('OAuthService', () => {
       validateToken: jest.fn(),
       extractJwtFromHeader: jest.fn(),
       extractJwtFromCookie: jest.fn(),
-    } as unknown as jest.Mocked<ImmichJwtService>;
+    } as unknown as jest.Mocked<ImmichUserTokenService>;
 
     immichConfigServiceMock = {
       config$: { subscribe: jest.fn() },
