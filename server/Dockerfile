@@ -35,8 +35,8 @@ COPY server/resources resources
 COPY server/package.json server/package-lock.json ./
 COPY server/start*.sh ./
 RUN npm link && npm cache clean --force
-COPY LICENSE /licenses/LICENSE.txt
-COPY LICENSE /LICENSE
+#COPY LICENSE /licenses/LICENSE.txt
+#COPY LICENSE /LICENSE
 ENV PATH="${PATH}:/usr/src/app/bin"
 VOLUME /usr/src/app/upload
 EXPOSE 3001
