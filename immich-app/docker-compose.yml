@@ -73,18 +73,9 @@ services:
     container_name: immich_redis
     image: redis:6.2-alpine@sha256:60e49e22fa5706cd8df7d5e0bc50ee9bab7c608039fa653c4d961014237cca46
     restart: always
-
   database:
     container_name: immich_postgres
-    image: supabase/postgres:15.1.0.117
-    ports:
-      - 5432:5432
-    command:
-      - postgres
-      - -c
-      - config_file=/etc/postgresql/postgresql.conf
-      - -c
-      - log_min_messages=fatal
+    image: tensorchord/pgvecto-rs:pg14-v0.1.11@sha256:0335a1a22f8c5dd1b697f14f079934f5152eaaa216c09b61e293be285491f8ee
     env_file:
       - .env
     environment:
@@ -93,8 +84,42 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  db:
+    container_name: supabase-db-immich
+    image: supabase/postgres:15.1.0.117
+    healthcheck:
+      test: pg_isready -U postgres -h localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      vector:
+        condition: service_healthy
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
+    restart: unless-stopped
+    ports:
+      # Pass down internal port because it's set dynamically by other services
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXPIRY}
+    volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
-        # Must be superuser to create event trigger
+      # Must be superuser to create event trigger
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
       # Must be superuser to alter reserved role
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
@@ -104,7 +129,6 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
-    restart: always
 
   studio:
     container_name: supabase-studio-immich
@@ -233,7 +257,7 @@ services:
     container_name: supabase-rest-immich
     image: postgrest/postgrest:v11.2.2
     depends_on:
-      database:
+      db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
       analytics:
@@ -254,7 +278,7 @@ services:
     container_name: realtime-dev.supabase-realtime-immich
     image: supabase/realtime:v2.25.35
     depends_on:
-      database:
+      db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
       analytics:
@@ -294,7 +318,7 @@ services:
     container_name: supabase-storage-immich
     image: supabase/storage-api:v0.43.11
     depends_on:
-      database:
+      db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
       rest:
@@ -353,7 +377,7 @@ services:
     container_name: supabase-meta-immich
     image: supabase/postgres-meta:v0.68.0
     depends_on:
-      database:
+      db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
       analytics:
@@ -399,7 +423,7 @@ services:
       retries: 10
     restart: unless-stopped
     depends_on:
-      database:
+      db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
     # Uncomment to use Big Query backend for analytics

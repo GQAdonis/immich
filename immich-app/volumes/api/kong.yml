@@ -1,15 +1,17 @@
-_format_version: "1.1"
+_format_version: '2.1'
+_transform: true
 
 ###
 ### Consumers / Users
 ###
 consumers:
+  - username: DASHBOARD
   - username: anon
     keyauth_credentials:
-      - key: ${anon_key}
+      - key: $SUPABASE_ANON_KEY
   - username: service_role
     keyauth_credentials:
-      - key: ${service_key}
+      - key: $SUPABASE_SERVICE_KEY
 
 ###
 ### Access Control List
@@ -21,12 +23,22 @@ acls:
     group: admin
 
 ###
+### Dashboard credentials
+###
+basicauth_credentials:
+- consumer: DASHBOARD
+  username: $DASHBOARD_USERNAME
+  password: $DASHBOARD_PASSWORD
+
+
+###
 ### API Routes
 ###
 services:
+
   ## Open Auth routes
   - name: auth-v1-open
-    url: ${auth_host}/verify
+    url: http://auth:9999/verify
     routes:
       - name: auth-v1-open
         strip_path: true
@@ -35,7 +47,7 @@ services:
     plugins:
       - name: cors
   - name: auth-v1-open-callback
-    url: ${auth_host}/callback
+    url: http://auth:9999/callback
     routes:
       - name: auth-v1-open-callback
         strip_path: true
@@ -43,15 +55,8 @@ services:
           - /auth/v1/callback
     plugins:
       - name: cors
-        config:
-          origins: [ '*' ]
-          methods: [ "GET", "POST", "PUT", "DELETE" ]
-          headers: [ "Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token" ]
-          exposed_headers: [ "X-Auth-Token" ]
-          max_age: 3600
-          credentials: true
   - name: auth-v1-open-authorize
-    url: ${auth_host}/authorize
+    url: http://auth:9999/authorize
     routes:
       - name: auth-v1-open-authorize
         strip_path: true
@@ -62,8 +67,8 @@ services:
 
   ## Secure Auth routes
   - name: auth-v1
-    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
-    url: ${auth_host}/
+    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
+    url: http://auth:9999/
     routes:
       - name: auth-v1-all
         strip_path: true
@@ -71,13 +76,6 @@ services:
           - /auth/v1/
     plugins:
       - name: cors
-        config:
-          origins: [ '*' ]
-          methods: [ "GET", "POST", "PUT", "DELETE" ]
-          headers: [ "Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token" ]
-          exposed_headers: [ "X-Auth-Token" ]
-          max_age: 3600
-          credentials: true
       - name: key-auth
         config:
           hide_credentials: false
@@ -90,8 +88,8 @@ services:
 
   ## Secure REST routes
   - name: rest-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
-    url: ${rest_host}/
+    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
+    url: http://rest:3000/
     routes:
       - name: rest-v1-all
         strip_path: true
@@ -99,13 +97,6 @@ services:
           - /rest/v1/
     plugins:
       - name: cors
-        config:
-          origins: [ '*' ]
-          methods: [ "GET", "POST", "PUT", "DELETE" ]
-          headers: [ "Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token" ]
-          exposed_headers: [ "X-Auth-Token" ]
-          max_age: 3600
-          credentials: true
       - name: key-auth
         config:
           hide_credentials: true
@@ -118,8 +109,8 @@ services:
 
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
-    url: ${rest_host}/rpc/graphql
+    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
+    url: http://rest:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
         strip_path: true
@@ -127,21 +118,14 @@ services:
           - /graphql/v1
     plugins:
       - name: cors
-        config:
-          origins: ['*']
-          methods: ["GET", "POST", "PUT", "DELETE"]
-          headers: [ "Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token" ]
-          exposed_headers: [ "X-Auth-Token" ]
-          max_age: 3600
-          credentials: true
       - name: key-auth
         config:
           hide_credentials: true
       - name: request-transformer
         config:
-          add: 
+          add:
             headers:
-              - "Content-Profile: graphql_public"
+              - Content-Profile:graphql_public
       - name: acl
         config:
           hide_groups_header: true
@@ -151,8 +135,8 @@ services:
 
   ## Secure Realtime routes
   - name: realtime-v1
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
-    url: ${realtime_host}/socket/
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    url: http://realtime-dev.supabase-realtime:4000/socket/
     routes:
       - name: realtime-v1-all
         strip_path: true
@@ -160,13 +144,6 @@ services:
           - /realtime/v1/
     plugins:
       - name: cors
-        config:
-          origins: [ '*' ]
-          methods: [ "GET", "POST", "PUT", "DELETE" ]
-          headers: [ "Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token" ]
-          exposed_headers: [ "X-Auth-Token" ]
-          max_age: 3600
-          credentials: true
       - name: key-auth
         config:
           hide_credentials: false
@@ -179,8 +156,8 @@ services:
 
   ## Storage routes: the storage server manages its own auth
   - name: storage-v1
-    _comment: "Storage: /storage/v1/* -> http://storage:5000/*"
-    url: ${storage_host}/
+    _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
+    url: http://storage:5000/
     routes:
       - name: storage-v1-all
         strip_path: true
@@ -189,10 +166,32 @@ services:
     plugins:
       - name: cors
 
+  ## Edge Functions routes
+  - name: functions-v1
+    _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
+    url: http://functions:9000/
+    routes:
+      - name: functions-v1-all
+        strip_path: true
+        paths:
+          - /functions/v1/
+    plugins:
+      - name: cors
+
+  ## Analytics routes
+  - name: analytics-v1
+    _comment: 'Analytics: /analytics/v1/* -> http://logflare:4000/*'
+    url: http://analytics:4000/
+    routes:
+      - name: analytics-v1-all
+        strip_path: true
+        paths:
+          - /analytics/v1/
+
   ## Secure Database routes
   - name: meta
-    _comment: "pg-meta: /pg/* -> http://pg-meta:8080/*"
-    url: ${meta_host}/
+    _comment: 'pg-meta: /pg/* -> http://pg-meta:8080/*'
+    url: http://meta:8080/
     routes:
       - name: meta-all
         strip_path: true
@@ -208,19 +207,17 @@ services:
           allow:
             - admin
 
-  - name: functions-v1
-    _comment: "Functions: /functions/v1/* -> http://edge-runtime:8081/*"
-    url: http://supabase_edge_runtime_supabase:8081/
+  ## Protected Dashboard - catch all remaining routes
+  - name: dashboard
+    _comment: 'Studio: /* -> http://studio:3000/*'
+    url: http://studio:3000/
     routes:
-      - name: functions-v1-all
+      - name: dashboard-all
         strip_path: true
         paths:
-          - /functions/v1/
-  - name: analytics-v1
-    _comment: "Analytics: /analytics/v1/* -> http://logflare:4000/*"
-    url: http://supabase_analytics_supabase:4000/
-    routes:
-      - name: analytics-v1-all
-        strip_path: true
-        paths:
-          - /analytics/v1/
+          - /
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true
