@@ -99,6 +99,10 @@ Spec: Free-tier Oracle VM - Amsterdam - 2.4Ghz quad-core ARM64 CPU, 24GB RAM
 | Read-only gallery                            | Yes    | Yes |
 | Stacked Photos                               | Yes    | Yes |
 
+## Assets and nodes database
+
+<img src="design/AssetsandNodes.png">
+
 ## Support the project
 
 I've committed to this project, and I will not stop. I will keep updating the docs, adding new features, and fixing bugs. But I can't do it alone. So I need your help to give me additional motivation to keep going.
