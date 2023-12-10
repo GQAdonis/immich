@@ -36,6 +36,7 @@
     "sql:generate": "node ./dist/infra/sql-generator/"
   },
   "dependencies": {
+    "@azure/openai": "^1.0.0-beta.8",
     "@babel/runtime": "^7.22.11",
     "@immich/cli": "^2.0.3",
     "@nestjs/bullmq": "^10.0.1",
@@ -49,6 +50,7 @@
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.2.2",
     "@socket.io/redis-adapter": "^8.2.1",
+    "@supabase/supabase-js": "^2.39.0",
     "archiver": "^6.0.0",
     "axios": "^1.5.0",
     "bcrypt": "^5.1.1",
@@ -69,6 +71,7 @@
     "luxon": "^3.4.2",
     "mv": "^2.1.1",
     "nest-commander": "^3.11.1",
+    "openai": "^4.20.1",
     "openid-client": "^5.4.3",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",

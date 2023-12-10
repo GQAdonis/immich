@@ -1,6 +1,7 @@
 import { bootstrap as admin } from './immich-admin/main';
 import { bootstrap as server } from './immich/main';
 import { bootstrap as microservices } from './microservices/main';
+import { bootstrap as aiservices } from './ai/main';
 
 const immichApp = process.argv[2] || process.env.IMMICH_APP;
 
@@ -19,6 +20,9 @@ function bootstrap() {
     case 'immich-admin':
       process.title = 'immich_admin_cli';
       return admin();
+    case 'ai':
+      process.title = 'ai';
+      return aiservices();
     default:
       console.log(`Invalid app name: ${immichApp}. Expected one of immich|microservices|cli`);
       process.exit(1);

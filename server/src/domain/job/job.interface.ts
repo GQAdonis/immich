@@ -40,3 +40,7 @@ export interface ISidecarWriteJob extends IEntityJob {
   latitude?: number;
   longitude?: number;
 }
+
+export interface IAnalyzeAssetJob extends IEntityJob {
+  ids: string[];
+}

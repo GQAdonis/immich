@@ -11,6 +11,7 @@ export enum QueueName {
   SEARCH = 'search',
   SIDECAR = 'sidecar',
   LIBRARY = 'library',
+  AI = 'ai',
 }
 
 export enum JobCommand {
@@ -98,6 +99,9 @@ export enum JobName {
   SIDECAR_DISCOVERY = 'sidecar-discovery',
   SIDECAR_SYNC = 'sidecar-sync',
   SIDECAR_WRITE = 'sidecar-write',
+
+  // AI
+  ANALYZE_ASSET = 'analyze-asset',
 }
 
 export const JOBS_ASSET_PAGINATION_SIZE = 1000;
@@ -179,4 +183,7 @@ export const JOBS_TO_QUEUE: Record<JobName, QueueName> = {
   [JobName.LIBRARY_REMOVE_OFFLINE]: QueueName.LIBRARY,
   [JobName.LIBRARY_QUEUE_SCAN_ALL]: QueueName.LIBRARY,
   [JobName.LIBRARY_QUEUE_CLEANUP]: QueueName.LIBRARY,
+
+  // AI
+  [JobName.ANALYZE_ASSET]: QueueName.AI,
 };

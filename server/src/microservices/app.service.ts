@@ -18,6 +18,7 @@ import {
 } from '@app/domain';
 
 import { Injectable, Logger } from '@nestjs/common';
+import {AiService} from "../ai/ai.service";
 
 @Injectable()
 export class AppService {
@@ -38,6 +39,7 @@ export class AppService {
     private storageService: StorageService,
     private systemConfigService: SystemConfigService,
     private userService: UserService,
+    private aiService: AiService,
   ) {}
 
   async init() {
@@ -91,6 +93,7 @@ export class AppService {
       [JobName.LIBRARY_REMOVE_OFFLINE]: (data) => this.libraryService.handleOfflineRemoval(data),
       [JobName.LIBRARY_QUEUE_SCAN_ALL]: (data) => this.libraryService.handleQueueAllScan(data),
       [JobName.LIBRARY_QUEUE_CLEANUP]: () => this.libraryService.handleQueueCleanup(),
+      [JobName.ANALYZE_ASSET]: (data) => this.aiService.handleAnalyzeAsset(data),
     });
 
     await this.metadataService.init();
